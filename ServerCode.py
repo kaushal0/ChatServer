@@ -15,10 +15,14 @@ def check_msg(msg):
 		return(3)
 	elif (msg.find('CHAT:'.encode('utf-8'))+1):
 		return(4)
-	else:
+	elif (msg.find('KILL_SERVICE'.encode('utf-8'))+1):
+		os._exit(1)
+	elif (msg.find('HELO'.encode('utf-8'))+1):
 		return(5)
+	else:
+		return(6)
 
-	
+
 def join(conn_msg,csock):
 	gname = conn_msg.find('JOIN_CHATROOM:'.encode('utf-8'))+14
 	gname_end = conn_msg.find('\n'.encode('utf-8'))
@@ -95,7 +99,9 @@ def chat(conn_msg,csock):
 	elif group_name == 'g2':
 		for x in g2_clients:
 			g2_clients[x].send(chat_text)
-			
+
+def resp(msg,socket):
+	pass
 
 class client_threads(Thread):
 
@@ -115,22 +121,22 @@ class client_threads(Thread):
 			conn_msg = csock.recv(1024)
 			print('CM : ')
 			print(conn_msg)
-			
+
 			cflag = check_msg(conn_msg)
-		  	if cflag == 1 :  				#joining the room
-				self.roomname, self.clientname, self.roomID = join(conn_msg, csock)
+		  	if cflag == 1 :
+				self.roomname,self.clientname,self.roomID = join(conn_msg, csock)
 			elif cflag == 2 : leave(conn_msg, csock)
-			elif cflag == 3 : return(0)      	
+			elif cflag == 3 : return(0)
 		  	elif cflag == 4 : chat(conn_msg, csock)
-      			else : print('Error. Please wait.')		         		#assigning error code for incorrect message
+			elif cflag == 5 : resp(conn_msg,csock)
+      		else : print('Error. Please wait.')			#assigning error code for incorrect message
+			self.chatroom.append(self.roomname)
 			print('Total clients in group g1 : ')
 			print(len(g1_clients))
 			print('Total clients in group g2 : ')
 			print(len(g2_clients))
-	def stop(self):
-		self._stop_event.set()
 
-			
+
 s=socket(AF_INET, SOCK_STREAM)
 HOST = socket.gethostbyname()						#'127.0.1.1'  	#localhost loopback
 PORT = 8000
@@ -149,8 +155,8 @@ g2_clients = []
 print ('Connected by : ', addr)
 
 while True:
-  s.listen(4)
-  (csock,(ip,port)) = server.accept()
+	s.listen(4)
+	(csock,(ip,port)) = s.accept()
 
 	print("Connected to ",port,ip) 					#monitoring connections
 
@@ -159,4 +165,3 @@ while True:
 	thread_count.append(clThread)
 	print("Threads :")
 	print(thread_count)
-
