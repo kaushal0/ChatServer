@@ -1,4 +1,3 @@
-
 import socket
 import time
 from socket import *
@@ -100,8 +99,19 @@ def chat(conn_msg,csock):
 		for x in g2_clients:
 			g2_clients[x].send(chat_text)
 
-def resp(msg,socket):
-	pass
+def resp(conn_msg,socket):
+	msg_start = conn_msg.find('HELO:'.encode('utf-8')) + 5
+	msg_end = conn_msg.find('\n'.encode('utf-8'),msg_start)
+
+    chat_msg = conn_msg[msg_start:msg_end]
+
+	response = "HELO: ".encode('utf-8') + chat_msg + "\n".encode('utf-8')
+    response += "IP: ".encode('utf-8') + str(clThread.ip).encode('utf-8') + "\n".encode('utf-8')
+    response += "PORT: ".encode('utf-8') + str(clThread.port).encode('utf-8') + "\n".encode('utf-8')
+    response += "StudentID: ".encode('utf-8') + "17310654".encode('utf-8') + "\n".encode('utf-8')
+
+    socket.send(response)
+
 
 class client_threads(Thread):
 
@@ -118,18 +128,21 @@ class client_threads(Thread):
 
 	def run(self):
 		while True:
+			print("Checkpoint 1")
 			conn_msg = csock.recv(1024)
-			print('CM : ')
+			print('Connection Message : ')
 			print(conn_msg)
 
+			print("Checkpoint 2")
 			cflag = check_msg(conn_msg)
 		  	if cflag == 1 :
 				self.roomname,self.clientname,self.roomID = join(conn_msg, csock)
+				print("Checkpoint 3")
 			elif cflag == 2 : leave(conn_msg, csock)
 			elif cflag == 3 : return(0)
-		  	elif cflag == 4 : chat(conn_msg, csock)
+			elif cflag == 4 : chat(conn_msg, csock)
 			elif cflag == 5 : resp(conn_msg,csock)
-      		else : print('Error. Please wait.')			#assigning error code for incorrect message
+			else : print('Error. Please wait.')			#assigning error code for incorrect message
 			self.chatroom.append(self.roomname)
 			print('Total clients in group g1 : ')
 			print(len(g1_clients))
@@ -139,7 +152,7 @@ class client_threads(Thread):
 
 s=socket(AF_INET, SOCK_STREAM)
 HOST = socket.gethostbyname()						#'127.0.1.1'  	#localhost loopback
-PORT = 8000
+PORT = 50000
 
 print ('Server is now live')
 print ('HOST NAME : ', HOST)
@@ -150,9 +163,6 @@ thread_count = []
 
 g1_clients = []
 g2_clients = []
-
-
-print ('Connected by : ', addr)
 
 while True:
 	s.listen(4)
