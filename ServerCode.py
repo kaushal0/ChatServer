@@ -65,12 +65,12 @@ def leave(conn_msg,csock):
 	grpmessage += "CLIENT_ID:".encode('utf-8') + str(clThread.uid).encode('utf-8') +"\n".encode('utf-8')
 	grpmessage += "LEFT GROUP".encode('utf-8')
 	print(group_name)
-	if (group_name.decode('utf-8')) == 'g1':
+	if (group_name.decode('utf-8')) == 'room1':
 		i = g1_clients.index(clThread.socket)
 		del g1_clients[i]
 		for x in g1_clients:
 			g1_clients[x].send(chat_text)
-	elif (group_name.decode('utf-8')) == 'g2':
+	elif (group_name.decode('utf-8')) == 'room2':
 		i = g2_clients.index(clThread.socket)
 		del g2_clients[i]
 		for x in g2_clients:
@@ -99,18 +99,18 @@ def chat(conn_msg,csock):
 		for x in g2_clients:
 			g2_clients[x].send(chat_text)
 
-def resp(conn_msg,socket):
+def resp(conn_msg,csock):
 	msg_start = conn_msg.find('HELO:'.encode('utf-8')) + 5
 	msg_end = conn_msg.find('\n'.encode('utf-8'),msg_start)
 
-    chat_msg = conn_msg[msg_start:msg_end]
+	chat_msg = conn_msg[msg_start:msg_end]
 
 	response = "HELO: ".encode('utf-8') + chat_msg + "\n".encode('utf-8')
-    response += "IP: ".encode('utf-8') + str(clThread.ip).encode('utf-8') + "\n".encode('utf-8')
-    response += "PORT: ".encode('utf-8') + str(clThread.port).encode('utf-8') + "\n".encode('utf-8')
-    response += "StudentID: ".encode('utf-8') + "17310654".encode('utf-8') + "\n".encode('utf-8')
-
-    socket.send(response)
+	response += "IP: ".encode('utf-8') + str(clThread.ip).encode('utf-8') + "\n".encode('utf-8')
+	response += "PORT: ".encode('utf-8') + str(clThread.port).encode('utf-8') + "\n".encode('utf-8')
+	response += "StudentID: ".encode('utf-8') + "17310654".encode('utf-8') + "\n".encode('utf-8')
+	
+	csock.send(response)
 
 
 class client_threads(Thread):
@@ -135,7 +135,7 @@ class client_threads(Thread):
 
 			print("Checkpoint 2")
 			cflag = check_msg(conn_msg)
-		  	if cflag == 1 :
+			if cflag == 1 :
 				self.roomname,self.clientname,self.roomID = join(conn_msg, csock)
 				print("Checkpoint 3")
 			elif cflag == 2 : leave(conn_msg, csock)
@@ -151,8 +151,8 @@ class client_threads(Thread):
 
 
 s=socket(AF_INET, SOCK_STREAM)
-HOST = socket.gethostbyname()						#'127.0.1.1'  	#localhost loopback
-PORT = 50000
+HOST = gethostbyname('localhost')				#'127.0.1.1'  	#localhost loopback
+PORT = 40000
 
 print ('Server is now live')
 print ('HOST NAME : ', HOST)
