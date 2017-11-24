@@ -6,12 +6,11 @@ from threading import Thread
 
 def join():
 	chatroom = input('Enter Chatroom Name to Enter : ')
-	Clname = input('\nEnter Client Name : ')
 
 	conn_msg = "JOIN_CHATROOM:".encode('utf-8') + chatroom.encode('utf-8') + "\n".encode('utf-8')
 	conn_msg += "CLIENT IP: \n".encode('utf-8')
 	conn_msg += "PORT: \n".encode('utf-8')
-	conn_msg += "CLIENT_NAME:".encode('utf-8') + Cname.encode('utf-8') + "\n".encode('utf-8')
+	conn_msg += "CLIENT_NAME:".encode('utf-8') + Clname.encode('utf-8') + "\n".encode('utf-8')
 	s.send(conn_msg)
 
 def chat(socket):
@@ -23,8 +22,25 @@ def chat(socket):
 	msg += "MESSAGE: ".encode('utf-8') + chat_message.encode('utf-8') + "\n\n".encode('utf-8')
 	s.send(msg)
 
+ def disconnect():
+ 	msg = "DISCONNECT: \n".encode('utf-8')
+ 	msg += "PORT: \n".encode('utf-8')
+ 	msg += "CLIENT_NAME: ".encode('utf-8') + Clname.encode('utf-8') + "\n".encode('utf-8')
+ 	s.send(msg)
+
+ 	s.close()
+ 	os._exit(1)
+
+def leave(socket):
+	rTL = input('Room to Leave ')
+	msg = "LEAVE_CHATROOM: ".encode('utf-8') + rTL.encode('utf-8') + "\n".encode('utf-8')
+	msg += "JOIN_ID: ".encode('utf-8') + jID.encode('utf-8') + "\n".encode('utf-8')
+	msg += "CLIENT_NAME: ".encode('utf-8') + Clname.encode('utf-8')
+	socket.send(msg)
+
+
 class client_thread(Thread):
-	def __init__(self, socket)
+	def __init__(self, socket):
 		Thread.__init__(self)
 		self.socket= socket
 
@@ -43,7 +59,7 @@ host = input('Enter the Hostname : ')
 port = input('Port')
 
 # connecting to host
-s.connect((host, port))
+s.connect((host, int(port)))
 
 #Basic response test
 
@@ -61,14 +77,13 @@ if p==0:
 cThread = client_thread(s)
 cThread.start()
 
-
-while(1):
+while(True):
 	print('Enter Option to choose:')
 	print('1. Join')
 	print('2. Chat')
 	print('3. Leave')
 	print('4. Disconnect')
-	task = input('?')
+	task = input('')
 	if task == '1':
 		join()
 	elif task == '2':
@@ -77,6 +92,6 @@ while(1):
 	elif task == '3':
 		leave()
 	elif task == '4':
-		discon()
+		disconnect()
 	elif task == '5':
-		print('Error')
+		print('Error. Please Enter Correct value')
