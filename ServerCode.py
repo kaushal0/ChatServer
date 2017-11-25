@@ -6,6 +6,7 @@ import random
 #from socket import socket, bind, listen, recv, send
 
 def check_msg(msg):
+	#check the type of incomming message
 	if (msg.find('JOIN_CHATROOM'.encode('utf-8'))+1):
 		return(1)
 	elif (msg.find('LEAVE_CHATROOM'.encode('utf-8'))+1):
@@ -23,9 +24,10 @@ def check_msg(msg):
 
 
 def join(conn_msg,csock):
+	#joining the chatroom
 	gname = conn_msg.find('JOIN_CHATROOM:'.encode('utf-8'))+14
 	gname_end = conn_msg.find('\n'.encode('utf-8'))
-	groupname = conn_msg[gname:gname_end]
+	groupname = conn_msg[gname:gname_end]							#Extracting Groupname
 
 	cname = conn_msg.find('CLIENT_NAME'.encode('utf-8'))+12
 	cname_end = conn_msg.find(' '.encode('utf-8'),cname)
@@ -94,7 +96,7 @@ def chat(conn_msg,csock):
 	chat_text += 'MESSAGE: ' + chat_msg.encode('utf-8')
 	if (group_name.decode('utf-8')) == 'g1':
 		for x in range(len(g1_clients)):
-			g1_clients[x].send(chat_text)
+			g1_clients[x].send(chat_text)							#broadcasting the message
 	elif group_name == 'g2':
 		for x in g2_clients:
 			g2_clients[x].send(chat_text)
@@ -109,7 +111,7 @@ def resp(conn_msg,csock):
 	response += "IP: ".encode('utf-8') + str(clThread.ip).encode('utf-8') + "\n".encode('utf-8')
 	response += "PORT: ".encode('utf-8') + str(clThread.port).encode('utf-8') + "\n".encode('utf-8')
 	response += "StudentID: ".encode('utf-8') + "17310654".encode('utf-8') + "\n".encode('utf-8')
-	
+
 	csock.send(response)
 
 
