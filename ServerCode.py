@@ -33,14 +33,13 @@ def join(conn_msg,csock):
 	cname_end = conn_msg.find(' '.encode('utf-8'),cname)
 	clientname = conn_msg[cname:cname_end]
 	rID = 0
-
 	if (groupname.decode('utf-8')) == 'g1' :
 		print('g1')
 		g1_clients.append(clThread.socket)
 		rID = 1001
 	elif groupname == 'g2' :
 		g2_clients.append(clThread.socket)
-		rID = 1002
+		rID = 1002	
 	print(g1_clients)
 	#sending ackowledgement
 	response = "JOINED_CHATROOM: ".encode('utf-8') + groupname+ "\n".encode('utf-8')
