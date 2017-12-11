@@ -22,7 +22,7 @@ def chat(socket):
 	msg += "MESSAGE: ".encode('utf-8') + chat_message.encode('utf-8') + "\n\n".encode('utf-8')
 	s.send(msg)
 
- def disconnect():
+def disconnect():
  	msg = "DISCONNECT: \n".encode('utf-8')
  	msg += "PORT: \n".encode('utf-8')
  	msg += "CLIENT_NAME: ".encode('utf-8') + Clname.encode('utf-8') + "\n".encode('utf-8')
